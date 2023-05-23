@@ -6,6 +6,7 @@
 
     canvas:
         Ellipse:
+            source: 'blue-ball.jpeg'
             pos: self.pos
             size: self.size
 
@@ -24,12 +25,10 @@
     player1: player_left
     player2: player_right
 
-    canvas:
+    canvas.before:
         Rectangle:
-            ## Бордюр посередине
-            pos: self.center_x - 5, 0
-            size: 10, self.height
-
+            source: 'table.png'
+            size: self.width, self.height
     Label:
         ## Очки игрока слева
         font_size: 70
@@ -44,6 +43,15 @@
         top: root.top - 50
         text: str(root.player2.score)
 
+    Label:
+        id: result
+        font_size: (root.width**2 + root.height**2) / 10**4
+        center_x: root.width / 2
+        top: root.height / 2 + 90
+        text: str(root.result)
+        color:0,0,0,1
+
+
     ##экземпляр нашего шарика в игровом поле
     PongBall:
         id: pong_ball
@@ -52,11 +60,19 @@
     ## создаем игрока 1
     PongPaddle:
         id: player_left
-        x: root.x
+        x: root.x + 10
         center_y: root.center_y
+
+        canvas.before:
+            Color:
+                rgba: 1, 0, 0, 1
 
     ## создаем игрока 2
     PongPaddle:
         id: player_right
-        x: root.width - self.width
+        x: root.width - self.width - 10
         center_y: root.center_y
+
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 1

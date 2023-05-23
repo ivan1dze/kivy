@@ -2,16 +2,19 @@ from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
-from kivy.properties import NumericProperty, ReferenceListProperty, ObjectProperty
+from kivy.properties import NumericProperty, ReferenceListProperty, ObjectProperty, StringProperty
 from kivy.vector import Vector
 from kivy.clock import Clock
+from kivy.core.audio import SoundLoader
 from random import randint
 
 class PongPaddle(Widget):
     score = NumericProperty(0)
+    otskok_sound = SoundLoader.load('otskok.mp3')
 
     def bounce_ball(self, ball):
         if self.collide_widget(ball):
+            self.otskok_sound.play()
             vx, vy = ball.velocity
             offset = (ball.center_y - self.center_y) / (self.height / 2)
             bounced = Vector(-1 * vx, vy)
@@ -24,6 +27,7 @@ class PongBall(Widget):
     velocity_y = NumericProperty(0)
     velocity = ReferenceListProperty(velocity_x, velocity_y)
 
+
     def move(self):
         self.pos = Vector(*self.velocity) + self.pos
 
@@ -33,6 +37,8 @@ class PongGame(Widget):
     player2 = ObjectProperty(None)
     is_running = False
     vs_ai = True
+    white_sound = SoundLoader.load('chill.mp3')
+    result = StringProperty('')
 
     def __init__(self, **kwargs):
         super(PongGame, self).__init__(**kwargs)
@@ -65,6 +71,15 @@ class PongGame(Widget):
         if self.vs_ai:
             self.move_ai_paddle()
 
+        if self.player1.score == 5:
+            self.result = "Blue Wins!"
+            self.is_running = False
+            Clock.unschedule(self.update)
+        elif self.player2.score == 5:
+            self.result = "Red Wins!"
+            self.is_running = False
+            Clock.unschedule(self.update)
+
     def on_touch_move(self, touch):
         if touch.x < self.width / 3:
             self.player1.center_y = touch.y
@@ -72,6 +87,7 @@ class PongGame(Widget):
             self.player2.center_y = touch.y
 
     def start_game(self, instance):
+        self.white_sound.play()
         self.is_running = True
         instance.disabled = True
         instance.opacity = 0
@@ -98,13 +114,13 @@ class PongApp(App):
         game.serve_ball()
         Clock.schedule_interval(game.update, 1.0/60)
 
-        layout = BoxLayout(orientation='vertical', spacing=10)
+        layout = BoxLayout(orientation='vertical', spacing=20, padding=(30,0,0,0))
         layout.add_widget(Widget(size_hint=(1, 1)))
-        start_button = Button(text='Start', size_hint=(None, None), size=(100, 50))
+        start_button = Button(text='Start', size_hint=(None, None), size=(150, 50))
         start_button.bind(on_press=game.start_game)
         layout.add_widget(start_button)
 
-        mode_button = Button(text='AI Mode', size_hint=(None, None), size=(100, 50))
+        mode_button = Button(text='AI Mode', size_hint=(None, None), size=(150, 50))
         mode_button.bind(on_press=game.switch_mode)
         layout.add_widget(mode_button)
 
