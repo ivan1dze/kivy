@@ -138,6 +138,7 @@ class PongApp(App):
 
         # Play the chill.mp3 song
         game.white_sound.loop = True
+        game.white_sound.volume = 0.05
         game.white_sound.play()
 
         return game
