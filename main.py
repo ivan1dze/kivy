@@ -120,12 +120,12 @@ class PongApp(App):
         Clock.schedule_interval(game.update, 1.0 / 60)
 
         layout = BoxLayout(orientation='vertical', spacing=20, padding=(30, 0, 0, 0))
-        layout.add_widget(Widget(size_hint=(1, 1)))
-        start_button = Button(text='Start', size_hint=(None, None), size=(150, 50))
+
+        start_button = Button(text='Start', size_hint=(None, None), size=(200, 70))
         start_button.bind(on_press=game.start_game)
         layout.add_widget(start_button)
 
-        mode_button = Button(text='AI Mode', size_hint=(None, None), size=(150, 50))
+        mode_button = Button(text='AI Mode', size_hint=(None, None), size=(200, 70))
         mode_button.bind(on_press=game.switch_mode)
         layout.add_widget(mode_button)
 
