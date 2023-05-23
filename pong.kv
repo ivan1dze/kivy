@@ -33,15 +33,18 @@
         ## Очки игрока слева
         font_size: 70
         center_x: root.width / 4
-        top: root.top - 50
+        top: root.top - 20
         text: str(root.player1.score)
+        color: 0, 0, 0, 1  # Черный цвет
 
     Label:
         ## Очки игрока справа
         font_size: 70
         center_x: root.width * 3 / 4
-        top: root.top - 50
+        top: root.top - 20
         text: str(root.player2.score)
+        color: 0, 0, 0, 1  # Черный цвет
+
 
     Label:
         id: result

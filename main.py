@@ -8,9 +8,13 @@ from kivy.clock import Clock
 from kivy.core.audio import SoundLoader
 from random import randint
 
+
 class PongPaddle(Widget):
     score = NumericProperty(0)
-    otskok_sound = SoundLoader.load('otskok.mp3')
+
+    def __init__(self, **kwargs):
+        super(PongPaddle, self).__init__(**kwargs)
+        self.otskok_sound = SoundLoader.load('otskok.mp3')
 
     def bounce_ball(self, ball):
         if self.collide_widget(ball):
@@ -22,14 +26,15 @@ class PongPaddle(Widget):
 
             ball.velocity = vel.x, vel.y + offset
 
+
 class PongBall(Widget):
     velocity_x = NumericProperty(0)
     velocity_y = NumericProperty(0)
     velocity = ReferenceListProperty(velocity_x, velocity_y)
 
-
     def move(self):
         self.pos = Vector(*self.velocity) + self.pos
+
 
 class PongGame(Widget):
     ball = ObjectProperty(None)
@@ -37,13 +42,13 @@ class PongGame(Widget):
     player2 = ObjectProperty(None)
     is_running = False
     vs_ai = True
-    white_sound = SoundLoader.load('chill.mp3')
     result = StringProperty('')
 
     def __init__(self, **kwargs):
         super(PongGame, self).__init__(**kwargs)
         self.start_button = None
         self.mode_button = None
+        self.white_sound = SoundLoader.load('chill.mp3')
 
     def serve_ball(self, vel=(4, 0)):
         self.ball.center = self.center
@@ -72,11 +77,11 @@ class PongGame(Widget):
             self.move_ai_paddle()
 
         if self.player1.score == 5:
-            self.result = "Blue Wins!"
+            self.result = "Red Wins!"
             self.is_running = False
             Clock.unschedule(self.update)
         elif self.player2.score == 5:
-            self.result = "Red Wins!"
+            self.result = "Blue Wins!"
             self.is_running = False
             Clock.unschedule(self.update)
 
@@ -87,7 +92,6 @@ class PongGame(Widget):
             self.player2.center_y = touch.y
 
     def start_game(self, instance):
-        self.white_sound.play()
         self.is_running = True
         instance.disabled = True
         instance.opacity = 0
@@ -108,13 +112,14 @@ class PongGame(Widget):
         elif self.ball.center_y < self.player2.center_y:
             self.player2.center_y -= min(5, self.player2.center_y - self.ball.center_y)
 
+
 class PongApp(App):
     def build(self):
         game = PongGame()
         game.serve_ball()
-        Clock.schedule_interval(game.update, 1.0/60)
+        Clock.schedule_interval(game.update, 1.0 / 60)
 
-        layout = BoxLayout(orientation='vertical', spacing=20, padding=(30,0,0,0))
+        layout = BoxLayout(orientation='vertical', spacing=20, padding=(30, 0, 0, 0))
         layout.add_widget(Widget(size_hint=(1, 1)))
         start_button = Button(text='Start', size_hint=(None, None), size=(150, 50))
         start_button.bind(on_press=game.start_game)
@@ -131,7 +136,12 @@ class PongApp(App):
         game.mode_button = mode_button
         game.layout = layout
 
+        # Play the chill.mp3 song
+        game.white_sound.loop = True
+        game.white_sound.play()
+
         return game
+
 
 if __name__ == '__main__':
     PongApp().run()
