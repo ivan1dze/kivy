@@ -53,6 +53,13 @@
         text: str(root.result)
         color: 0, 0, 0, 1
 
+    Label:
+        font_size: 70
+        center_x: root.width * 3 / 6
+        top: root.top - 20
+        text: f"Time: {int(root.elapsed_time)} s"
+        color: 0, 0, 0, 1
+
 
     ##экземпляр нашего шарика в игровом поле
     PongBall:
