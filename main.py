@@ -7,7 +7,6 @@ from kivy.vector import Vector
 from kivy.clock import Clock
 from kivy.core.audio import SoundLoader
 from random import randint
-from kivy.uix.screenmanager import ScreenManager, Screen
 from functools import partial
 
 class PongBall(Widget):
