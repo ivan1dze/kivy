@@ -31,17 +31,17 @@
             size: self.width, self.height
     Label:
         ## Очки игрока слева
-        font_size: 70
+        font_size: 135
         center_x: root.width / 4
-        top: root.top - 30
+        top: root.top - 40
         text: str(root.player1.score)
         color: 0, 0, 0, 1  # Черный цвет
 
     Label:
         ## Очки игрока справа
-        font_size: 70
+        font_size: 135
         center_x: root.width * 3 / 4
-        top: root.top - 30
+        top: root.top - 40
         text: str(root.player2.score)
         color: 0, 0, 0, 1  # Черный цвет
 
@@ -54,9 +54,9 @@
         color: 0, 0, 0, 1
 
     Label:
-        font_size: 70
+        font_size: 110
         center_x: root.width * 3 / 6
-        top: root.top - 30
+        top: root.top - 40
         text: f"Time: {int(root.elapsed_time)} s"
         color: 0, 0, 0, 1
 
