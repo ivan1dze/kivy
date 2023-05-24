@@ -7,6 +7,16 @@ from kivy.vector import Vector
 from kivy.clock import Clock
 from kivy.core.audio import SoundLoader
 from random import randint
+from kivy.uix.screenmanager import ScreenManager, Screen
+from functools import partial
+
+class PongBall(Widget):
+    velocity_x = NumericProperty(0)
+    velocity_y = NumericProperty(0)
+    velocity = ReferenceListProperty(velocity_x, velocity_y)
+
+    def move(self):
+        self.pos = Vector(*self.velocity) + self.pos
 
 
 class PongPaddle(Widget):
@@ -22,18 +32,9 @@ class PongPaddle(Widget):
             vx, vy = ball.velocity
             offset = (ball.center_y - self.center_y) / (self.height / 2)
             bounced = Vector(-1 * vx, vy)
-            vel = bounced * 1.1
+            vel = bounced * 1.4
 
             ball.velocity = vel.x, vel.y + offset
-
-
-class PongBall(Widget):
-    velocity_x = NumericProperty(0)
-    velocity_y = NumericProperty(0)
-    velocity = ReferenceListProperty(velocity_x, velocity_y)
-
-    def move(self):
-        self.pos = Vector(*self.velocity) + self.pos
 
 
 class PongGame(Widget):
@@ -49,8 +50,14 @@ class PongGame(Widget):
         self.start_button = None
         self.mode_button = None
         self.white_sound = SoundLoader.load('chill.mp3')
+        self.end_button = Button(text='Return to Main Menu', size_hint=(None, None), size=(250, 120))
+        self.end_button.bind(on_press=self.return_to_main_menu)
+        self.end_button.disabled = True
+        self.end_button.opacity = 0
 
-    def serve_ball(self, vel=(4, 0)):
+        self.move_paddle_event = None  # Event for moving paddles
+
+    def serve_ball(self, vel=(6.5, 2)):
         self.ball.center = self.center
         self.ball.velocity = Vector(vel[0], vel[1]).rotate(randint(0, 360))
 
@@ -79,17 +86,40 @@ class PongGame(Widget):
         if self.player1.score == 5:
             self.result = "Red Wins!"
             self.is_running = False
+            self.end_button.disabled = False
+            self.end_button.opacity = 1
             Clock.unschedule(self.update)
         elif self.player2.score == 5:
             self.result = "Blue Wins!"
             self.is_running = False
+            self.end_button.disabled = False
+            self.end_button.opacity = 1
             Clock.unschedule(self.update)
 
     def on_touch_move(self, touch):
-        if touch.x < self.width / 3:
-            self.player1.center_y = touch.y
-        elif touch.x > self.width - self.width / 3:
-            self.player2.center_y = touch.y
+        if self.vs_ai:
+            if touch.x < self.width / 3:
+                self.player1.center_y = touch.y
+        else:
+            if touch.x < self.width / 3:
+                self.player1.center_y = touch.y
+            elif touch.x > self.width - self.width / 3:
+                self.player2.center_y = touch.y
+
+    def return_to_main_menu(self, instance):
+        self.is_running = False
+        self.player1.score = 0
+        self.player2.score = 0
+        self.result = ''  # Clear the result
+        self.remove_widget(self.end_button)
+        self.start_button.disabled = False
+        self.start_button.opacity = 1
+        self.mode_button.disabled = False
+        self.mode_button.opacity = 1
+        Clock.unschedule(self.update)
+        self.ball.velocity = (0, 0)
+        self.ball.center = self.center
+        self.serve_ball()  # Serve the ball for the next match
 
     def start_game(self, instance):
         self.is_running = True
@@ -97,14 +127,30 @@ class PongGame(Widget):
         instance.opacity = 0
         self.mode_button.disabled = True
         self.mode_button.opacity = 0
-        self.remove_widget(self.layout)  # Remove the layout widget
+        self.add_widget(self.end_button)
+        self.player1.score = 0
+        self.player2.score = 0
+        self.result = ''  # Clear the result
+        self.end_button.disabled = True
+        self.end_button.opacity = 0
+        self.serve_ball()
 
         if self.vs_ai:
             self.player2.center_y = self.center_y
 
+        Clock.unschedule(self.update)  # Unscheduling previous updates
+        Clock.schedule_interval(self.update, 1.0 / 60)  # Schedule the update again
+
+        # Start moving paddles
+        self.move_paddle_event = Clock.schedule_interval(partial(self.move_paddles), 1.0 / 60)
+
     def switch_mode(self, instance):
         self.vs_ai = not self.vs_ai
         instance.text = "AI Mode" if self.vs_ai else "2 Players Mode"
+
+    def move_paddles(self, dt):
+        if self.vs_ai:
+            self.move_ai_paddle()
 
     def move_ai_paddle(self):
         if self.ball.center_y > self.player2.center_y:
@@ -117,28 +163,23 @@ class PongApp(App):
     def build(self):
         game = PongGame()
         game.serve_ball()
-        Clock.schedule_interval(game.update, 1.0 / 60)
 
         layout = BoxLayout(orientation='vertical', spacing=20, padding=(30, 0, 0, 0))
 
-        start_button = Button(text='Start', size_hint=(None, None), size=(200, 70))
-        start_button.bind(on_press=game.start_game)
-        layout.add_widget(start_button)
+        game.start_button = Button(text='Start', size_hint=(None, None), size=(250, 120))
+        game.start_button.bind(on_press=game.start_game)
+        layout.add_widget(game.start_button)
 
-        mode_button = Button(text='AI Mode', size_hint=(None, None), size=(200, 70))
-        mode_button.bind(on_press=game.switch_mode)
-        layout.add_widget(mode_button)
+        game.mode_button = Button(text='AI Mode', size_hint=(None, None), size=(250, 120))
+        game.mode_button.bind(on_press=game.switch_mode)
+        layout.add_widget(game.mode_button)
 
         layout.add_widget(Widget(size_hint=(1, 1)))
         game.add_widget(layout)
 
-        game.start_button = start_button
-        game.mode_button = mode_button
-        game.layout = layout
-
         # Play the chill.mp3 song
         game.white_sound.loop = True
-        game.white_sound.volume = 0.05
+        game.white_sound.volume = 0.08
         game.white_sound.play()
 
         return game
