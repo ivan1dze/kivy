@@ -13,6 +13,10 @@ from functools import partial
 from datetime import datetime
 
 class PongBall(Widget):
+    balls_list = os.listdir('img/balls')
+    path_to_balls_imgs = 'img/balls/'
+    ball_image = StringProperty(path_to_balls_imgs + balls_list[0])
+
     velocity_x = NumericProperty(0)
     velocity_y = NumericProperty(0)
     velocity = ReferenceListProperty(velocity_x, velocity_y)
@@ -52,6 +56,7 @@ class PongGame(Widget):
     path_to_bg_imgs = 'img/backgrounds/'
     background_image = StringProperty(path_to_bg_imgs + backgrounds_list[0])
 
+
     def change_background(self, instance):
         for i in range(len(self.backgrounds_list)):
             if self.path_to_bg_imgs + self.backgrounds_list[i] == self.background_image:
@@ -62,11 +67,22 @@ class PongGame(Widget):
                     self.background_image = self.path_to_bg_imgs + self.backgrounds_list[i+1]
                     break
 
+    def change_ball(self, instance):
+        for i in range(len(self.ball.balls_list)):
+            if self.ball.path_to_balls_imgs + self.ball.balls_list[i] == self.ball.ball_image:
+                if i+1 == len(self.ball.balls_list):
+                    self.ball.ball_image = self.ball.path_to_balls_imgs + self.ball.balls_list[0]
+                    break
+                else:
+                    self.ball.ball_image = self.ball.path_to_balls_imgs + self.ball.balls_list[i+1]
+                    break
+
     def __init__(self, **kwargs):
         super(PongGame, self).__init__(**kwargs)
         self.start_button = None
         self.mode_button = None
         self.background_image_button = None
+        self.ball_button = None
         self.white_sound = SoundLoader.load('chill.mp3')
         self.end_button = Button(text='Return to Main Menu', size_hint=(None, None), size=(350, 150), pos_hint={'x': 0.7})
         self.end_button.bind(on_press=self.return_to_main_menu)
@@ -138,6 +154,8 @@ class PongGame(Widget):
         self.mode_button.opacity = 1
         self.background_image_button.disabled = False
         self.background_image_button.opacity = 1
+        self.ball_button.disabled = False
+        self.ball_button.opacity = 1
         Clock.unschedule(self.update)
         self.ball.velocity = (0, 0)
         self.ball.center = self.center
@@ -153,6 +171,8 @@ class PongGame(Widget):
         self.mode_button.opacity = 0
         self.background_image_button.disabled = True
         self.background_image_button.opacity = 0
+        self.ball_button.disabled = True
+        self.ball_button.opacity = 0
         self.add_widget(self.end_button)
         self.player1.score = 0
         self.player2.score = 0
@@ -205,6 +225,10 @@ class PongApp(App):
         game.background_image_button = Button(text='Change Background', size_hint=(None, None), size=(250, 120))
         game.background_image_button.bind(on_press=game.change_background)
         layout.add_widget(game.background_image_button)
+
+        game.ball_button = Button(text='Change Ball', size_hint=(None, None), size=(250, 120))
+        game.ball_button.bind(on_press=game.change_ball)
+        layout.add_widget(game.ball_button)
 
         layout.add_widget(Widget(size_hint=(1, 1)))
         game.add_widget(layout)

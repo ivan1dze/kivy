@@ -6,7 +6,7 @@
 
     canvas:
         Ellipse:
-            source: 'img/blue-ball.png'
+            source: self.ball_image
             pos: self.pos
             size: self.size
 
@@ -33,7 +33,7 @@
         ## Очки игрока слева
         font_size: 70
         center_x: root.width / 4
-        top: root.top - 20
+        top: root.top - 40
         text: str(root.player1.score)
         color: 0, 0, 0, 1  # Черный цвет
 
@@ -41,7 +41,7 @@
         ## Очки игрока справа
         font_size: 70
         center_x: root.width * 3 / 4
-        top: root.top - 20
+        top: root.top - 40
         text: str(root.player2.score)
         color: 0, 0, 0, 1  # Черный цвет
 
@@ -56,7 +56,7 @@
     Label:
         font_size: 70
         center_x: root.width * 3 / 6
-        top: root.top - 20
+        top: root.top - 40
         text: f"Time: {int(root.elapsed_time)} s"
         color: 0, 0, 0, 1
 
