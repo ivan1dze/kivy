@@ -49,16 +49,17 @@ class PongGame(Widget):
     result = StringProperty('')
     start_time = NumericProperty(0)
     elapsed_time = NumericProperty(0)
-    background_image = StringProperty('img/backgrounds/' + backgrounds_list[0])
+    path_to_bg_imgs = 'img/backgrounds/'
+    background_image = StringProperty(path_to_bg_imgs + backgrounds_list[0])
 
     def change_background(self, instance):
         for i in range(len(self.backgrounds_list)):
-            if 'img/backgrounds/' + self.backgrounds_list[i] == self.background_image:
+            if self.path_to_bg_imgs + self.backgrounds_list[i] == self.background_image:
                 if i+1 == len(self.backgrounds_list):
-                    self.background_image = 'img/backgrounds/' + self.backgrounds_list[0]
+                    self.background_image = self.path_to_bg_imgs + self.backgrounds_list[0]
                     break
                 else:
-                    self.background_image = 'img/backgrounds/' + self.backgrounds_list[i+1]
+                    self.background_image = self.path_to_bg_imgs + self.backgrounds_list[i+1]
                     break
 
     def __init__(self, **kwargs):
