@@ -1,3 +1,5 @@
+import os
+
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.uix.button import Button
@@ -38,6 +40,7 @@ class PongPaddle(Widget):
 
 
 class PongGame(Widget):
+    backgrounds_list = os.listdir('img/backgrounds')
     ball = ObjectProperty(None)
     player1 = ObjectProperty(None)
     player2 = ObjectProperty(None)
@@ -46,18 +49,23 @@ class PongGame(Widget):
     result = StringProperty('')
     start_time = NumericProperty(0)
     elapsed_time = NumericProperty(0)
-    background_image = StringProperty('table.png')
+    background_image = StringProperty('img/backgrounds/' + backgrounds_list[0])
 
     def change_background(self, instance):
-        if self.background_image == 'table.png':
-            self.background_image = 'tennis.jpg'
-        else:
-            self.background_image = 'table.png'
+        for i in range(len(self.backgrounds_list)):
+            if 'img/backgrounds/' + self.backgrounds_list[i] == self.background_image:
+                if i+1 == len(self.backgrounds_list):
+                    self.background_image = 'img/backgrounds/' + self.backgrounds_list[0]
+                    break
+                else:
+                    self.background_image = 'img/backgrounds/' + self.backgrounds_list[i+1]
+                    break
 
     def __init__(self, **kwargs):
         super(PongGame, self).__init__(**kwargs)
         self.start_button = None
         self.mode_button = None
+        self.background_image_button = None
         self.white_sound = SoundLoader.load('chill.mp3')
         self.end_button = Button(text='Return to Main Menu', size_hint=(None, None), size=(350, 150), pos_hint={'x': 0.7})
         self.end_button.bind(on_press=self.return_to_main_menu)
@@ -127,6 +135,8 @@ class PongGame(Widget):
         self.start_button.opacity = 1
         self.mode_button.disabled = False
         self.mode_button.opacity = 1
+        self.background_image_button.disabled = False
+        self.background_image_button.opacity = 1
         Clock.unschedule(self.update)
         self.ball.velocity = (0, 0)
         self.ball.center = self.center
@@ -140,6 +150,8 @@ class PongGame(Widget):
         instance.opacity = 0
         self.mode_button.disabled = True
         self.mode_button.opacity = 0
+        self.background_image_button.disabled = True
+        self.background_image_button.opacity = 0
         self.add_widget(self.end_button)
         self.player1.score = 0
         self.player2.score = 0
@@ -189,13 +201,12 @@ class PongApp(App):
         game.mode_button.bind(on_press=game.switch_mode)
         layout.add_widget(game.mode_button)
 
+        game.background_image_button = Button(text='Change Background', size_hint=(None, None), size=(250, 120))
+        game.background_image_button.bind(on_press=game.change_background)
+        layout.add_widget(game.background_image_button)
+
         layout.add_widget(Widget(size_hint=(1, 1)))
         game.add_widget(layout)
-
-        change_background_button = Button(text='Change Background', size_hint=(None, None), size=(200, 50),
-                                          pos=(50,210))
-        change_background_button.bind(on_press=game.change_background)
-        game.add_widget(change_background_button)
 
         # Play the chill.mp3 song
         game.white_sound.loop = True
