@@ -8,6 +8,7 @@ from kivy.clock import Clock
 from kivy.core.audio import SoundLoader
 from random import randint
 from functools import partial
+from datetime import datetime
 
 class PongBall(Widget):
     velocity_x = NumericProperty(0)
@@ -43,6 +44,8 @@ class PongGame(Widget):
     is_running = False
     vs_ai = True
     result = StringProperty('')
+    start_time = NumericProperty(0)
+    elapsed_time = NumericProperty(0)
 
     def __init__(self, **kwargs):
         super(PongGame, self).__init__(**kwargs)
@@ -64,6 +67,8 @@ class PongGame(Widget):
         if not self.is_running:
             return
 
+        current_time = datetime.now().timestamp()
+        self.elapsed_time = current_time - self.start_time
         self.ball.move()
         self.player1.bounce_ball(self.ball)
         self.player2.bounce_ball(self.ball)
@@ -119,7 +124,8 @@ class PongGame(Widget):
         self.ball.velocity = (0, 0)
         self.ball.center = self.center
         self.serve_ball()  # Serve the ball for the next match
-
+        self.start_time = 0
+        self.elapsed_time = 0
     def start_game(self, instance):
         self.is_running = True
         instance.disabled = True
@@ -133,6 +139,7 @@ class PongGame(Widget):
         self.end_button.disabled = True
         self.end_button.opacity = 0
         self.serve_ball()
+        self.start_time = datetime.now().timestamp()
 
         if self.vs_ai:
             self.player2.center_y = self.center_y
