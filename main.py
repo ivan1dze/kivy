@@ -39,8 +39,7 @@ class PongPaddle(Widget):
             vx, vy = ball.velocity
             offset = (ball.center_y - self.center_y) / (self.height / 2)
             bounced = Vector(-1 * vx, vy)
-            vel = bounced * 1.4
-
+            vel = bounced * 1.2
             ball.velocity = vel.x, vel.y + offset
 
 
@@ -92,9 +91,10 @@ class PongGame(Widget):
 
         self.move_paddle_event = None  # Event for moving paddles
 
-    def serve_ball(self, vel=(6.5, 2)):
+    def serve_ball(self, vel=(8, 2)):
         self.ball.center = self.center
-        self.ball.velocity = Vector(vel[0], vel[1]).rotate(randint(0, 360))
+        angle = randint(10, 60)  #угол 10 и 240 градусов
+        self.ball.velocity = Vector(vel[0], vel[1]).rotate(angle)
 
     def update(self, dt):
         if not self.is_running:
@@ -111,11 +111,11 @@ class PongGame(Widget):
 
         if self.ball.x < self.x:
             self.player2.score += 1
-            self.serve_ball(vel=(4, 0))
+            self.serve_ball(vel=(8, 0))
 
         if self.ball.x > self.width:
             self.player1.score += 1
-            self.serve_ball(vel=(-4, 0))
+            self.serve_ball(vel=(-8, 0))
 
         if self.vs_ai:
             self.move_ai_paddle()
@@ -223,7 +223,7 @@ class PongApp(App):
         game.mode_button.bind(on_press=game.switch_mode)
         layout.add_widget(game.mode_button)
 
-        game.background_image_button = Button(text='Change Background', size_hint=(None, None), size=(290, 100))
+        game.background_image_button = Button(text='Change Table', size_hint=(None, None), size=(290, 100))
         game.background_image_button.bind(on_press=game.change_background)
         layout.add_widget(game.background_image_button)
 
