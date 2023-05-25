@@ -56,6 +56,21 @@ class PongGame(Widget):
     path_to_bg_imgs = 'img/backgrounds/'
     background_image = StringProperty(path_to_bg_imgs + backgrounds_list[0])
 
+    def __init__(self, **kwargs):
+        super(PongGame, self).__init__(**kwargs)
+        self.start_button = None
+        self.mode_button = None
+        self.background_image_button = None
+        self.ball_button = None
+        self.white_sound = SoundLoader.load('chill.mp3')
+        self.end_button = Button(text='Return to Main Menu', size_hint=(None, None), size=(350, 150),
+                                 pos_hint={'x': 0.7})
+        self.end_button.bind(on_press=self.return_to_main_menu)
+        self.end_button.disabled = True
+        self.end_button.opacity = 0
+
+        self.move_paddle_event = None  # Event for moving paddles
+
     def change_background(self, instance):
         for i in range(len(self.backgrounds_list)):
             if self.path_to_bg_imgs + self.backgrounds_list[i] == self.background_image:
@@ -75,21 +90,6 @@ class PongGame(Widget):
                 else:
                     self.ball.ball_image = self.ball.path_to_balls_imgs + self.ball.balls_list[i + 1]
                     break
-
-    def __init__(self, **kwargs):
-        super(PongGame, self).__init__(**kwargs)
-        self.start_button = None
-        self.mode_button = None
-        self.background_image_button = None
-        self.ball_button = None
-        self.white_sound = SoundLoader.load('chill.mp3')
-        self.end_button = Button(text='Return to Main Menu', size_hint=(None, None), size=(350, 150),
-                                 pos_hint={'x': 0.7})
-        self.end_button.bind(on_press=self.return_to_main_menu)
-        self.end_button.disabled = True
-        self.end_button.opacity = 0
-
-        self.move_paddle_event = None  # Event for moving paddles
 
     def serve_ball(self, vel=(8, 2)):
         self.ball.center = self.center
@@ -145,8 +145,7 @@ class PongGame(Widget):
 
     def return_to_main_menu(self, instance):
         self.is_running = False
-        self.player1.score = 0
-        self.player2.score = 0
+        self.reset_score()
         self.result = ''  # Clear the result
         self.remove_widget(self.end_button)
         self.start_button.disabled = False
@@ -175,8 +174,7 @@ class PongGame(Widget):
         self.ball_button.disabled = True
         self.ball_button.opacity = 0
         self.add_widget(self.end_button)
-        self.player1.score = 0
-        self.player2.score = 0
+        self.reset_score()
         self.result = ''  # Clear the result
         self.end_button.disabled = True
         self.end_button.opacity = 0
@@ -191,6 +189,10 @@ class PongGame(Widget):
 
         # Start moving paddles
         self.move_paddle_event = Clock.schedule_interval(partial(self.move_paddles), 1.0 / 60)
+
+    def reset_score(self):
+        self.player1.score = 0
+        self.player2.score = 0
 
     def switch_mode(self, instance):
         self.vs_ai = not self.vs_ai
