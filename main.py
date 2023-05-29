@@ -1,19 +1,45 @@
 import os
-from random import randint
-from functools import partial
-from datetime import datetime
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.popup import Popup  # Добавляем импорт для Popup
-from kivy.uix.label import Label
 from kivy.properties import NumericProperty, ReferenceListProperty, ObjectProperty, StringProperty
 from kivy.vector import Vector
 from kivy.clock import Clock
 from kivy.core.audio import SoundLoader
-from kivy.logger import Logger
+from random import randint
+from functools import partial
+from datetime import datetime
+from kivy.uix.popup import Popup  # Добавляем импорт для Popup
+from kivy.uix.label import Label
+import logging
+from kivy.utils import platform
 
+log_folder = ""
+log_file = ""
+
+log_folder = os.path.join(os.getenv('EXTERNAL_STORAGE'), 'kivy') if platform == 'android' else os.path.join(os.path.expanduser('~'), '.kivy')
+log_file = os.path.join(log_folder, 'game.log')
+
+# создаем папку если не создана
+os.makedirs(log_folder, exist_ok=True)
+
+logger = logging.getLogger('game')
+logger.setLevel(logging.DEBUG)
+
+# создаем хендлер и ставим для его уровень
+file_handler = logging.FileHandler(log_file)
+file_handler.setLevel(logging.DEBUG)
+
+# формат для логгинга
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(formatter)
+
+# добавляем хендлер в логгер
+logger.addHandler(file_handler)
+
+logger.debug('Log folder created: {}'.format(log_folder))
+logger.debug('Log file path: {}'.format(log_file))
 
 class PongBall(Widget):
     balls_list = os.listdir('img/balls')
@@ -43,6 +69,7 @@ class PongPaddle(Widget):
             bounced = Vector(-1 * vx, vy)
             vel = bounced * 1.15
             ball.velocity = vel.x, vel.y + offset
+            logger.debug('Ball bounced')
 
 
 class PongGame(Widget):
@@ -73,8 +100,9 @@ class PongGame(Widget):
 
         self.move_paddle_event = None  # Event for moving paddles
 
+
     def change_background(self, instance):
-        Logger.info('UI: Change background.')
+        logger.debug('Background changed')
         for i in range(len(self.backgrounds_list)):
             if self.path_to_bg_imgs + self.backgrounds_list[i] == self.background_image:
                 if i + 1 == len(self.backgrounds_list):
@@ -85,7 +113,7 @@ class PongGame(Widget):
                     break
 
     def change_ball(self, instance):
-        Logger.info('UI: Change ball.')
+        logger.debug('Ball changed')
         for i in range(len(self.ball.balls_list)):
             if self.ball.path_to_balls_imgs + self.ball.balls_list[i] == self.ball.ball_image:
                 if i + 1 == len(self.ball.balls_list):
@@ -150,12 +178,11 @@ class PongGame(Widget):
                 self.player2.center_y = touch.y
 
     def show_results(self):
+        logger.debug('Pop up created')
         if self.player1.score > self.player2.score:
             winner = "Red Wins!"
         else:
             winner = "Blue Wins!"
-
-        Logger.info(f'GAME: Game over. {winner}')
 
         score_message = "Red Score: {}\nBlue Score: {}\nElapsed Time: {:.2f} seconds".format(
             self.player1.score, self.player2.score, self.elapsed_time)
@@ -231,7 +258,7 @@ class PongGame(Widget):
     def switch_mode(self, instance):
         self.vs_ai = not self.vs_ai
         instance.text = "AI Mode" if self.vs_ai else "2 Players Mode"
-
+        logger.debug('Mode switched: AI Mode' if self.vs_ai else '2 Players Mode')
     def move_paddles(self, dt):
         if self.vs_ai:
             self.move_ai_paddle()
@@ -247,7 +274,6 @@ class PongApp(App):
 
     def build(self):
         game = PongGame()
-
         layout = BoxLayout(orientation='vertical', spacing=20, padding=(30, 0, 0, 0))
 
         game.start_button = Button(text='Start', size_hint=(None, None), size=(290, 100))
