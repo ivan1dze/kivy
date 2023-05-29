@@ -1,17 +1,18 @@
 import os
+from random import randint
+from functools import partial
+from datetime import datetime
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.popup import Popup  # Добавляем импорт для Popup
+from kivy.uix.label import Label
 from kivy.properties import NumericProperty, ReferenceListProperty, ObjectProperty, StringProperty
 from kivy.vector import Vector
 from kivy.clock import Clock
 from kivy.core.audio import SoundLoader
-from random import randint
-from functools import partial
-from datetime import datetime
-from kivy.uix.popup import Popup  # Добавляем импорт для Popup
-from kivy.uix.label import Label
+from kivy.logger import Logger
 
 
 class PongBall(Widget):
@@ -73,6 +74,7 @@ class PongGame(Widget):
         self.move_paddle_event = None  # Event for moving paddles
 
     def change_background(self, instance):
+        Logger.info('UI: Change background.')
         for i in range(len(self.backgrounds_list)):
             if self.path_to_bg_imgs + self.backgrounds_list[i] == self.background_image:
                 if i + 1 == len(self.backgrounds_list):
@@ -83,6 +85,7 @@ class PongGame(Widget):
                     break
 
     def change_ball(self, instance):
+        Logger.info('UI: Change ball.')
         for i in range(len(self.ball.balls_list)):
             if self.ball.path_to_balls_imgs + self.ball.balls_list[i] == self.ball.ball_image:
                 if i + 1 == len(self.ball.balls_list):
@@ -151,6 +154,8 @@ class PongGame(Widget):
             winner = "Red Wins!"
         else:
             winner = "Blue Wins!"
+
+        Logger.info(f'GAME: Game over. {winner}')
 
         score_message = "Red Score: {}\nBlue Score: {}\nElapsed Time: {:.2f} seconds".format(
             self.player1.score, self.player2.score, self.elapsed_time)
