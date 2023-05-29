@@ -1,5 +1,4 @@
 import os
-
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.uix.button import Button
@@ -11,6 +10,8 @@ from kivy.core.audio import SoundLoader
 from random import randint
 from functools import partial
 from datetime import datetime
+from kivy.uix.popup import Popup  # Добавляем импорт для Popup
+from kivy.uix.label import Label
 
 
 class PongBall(Widget):
@@ -65,7 +66,7 @@ class PongGame(Widget):
         self.white_sound = SoundLoader.load('chill.mp3')
         self.end_button = Button(text='Return to Main Menu', size_hint=(None, None), size=(350, 150),
                                  pos_hint={'x': 0.7})
-        self.end_button.bind(on_press=self.return_to_main_menu)
+        self.end_button.bind(on_press=self.show_results)  # Изменяем привязку кнопки к новому методу
         self.end_button.disabled = True
         self.end_button.opacity = 0
 
@@ -93,7 +94,7 @@ class PongGame(Widget):
 
     def serve_ball(self, vel=(8, 2)):
         self.ball.center = self.center
-        angle = randint(10, 60)  #угол 10 и 240 градусов
+        angle = randint(10, 60)  # угол 10 и 240 градусов
         self.ball.velocity = Vector(vel[0], vel[1]).rotate(angle)
 
     def update(self, dt):
@@ -126,12 +127,14 @@ class PongGame(Widget):
             self.end_button.disabled = False
             self.end_button.opacity = 1
             Clock.unschedule(self.update)
+            self.show_results()  # Вызываем метод для вывода результатов
         elif self.player2.score == 5:
             self.result = "Blue Wins!"
             self.is_running = False
             self.end_button.disabled = False
             self.end_button.opacity = 1
             Clock.unschedule(self.update)
+            self.show_results()  # Вызываем метод для вывода результатов
 
     def on_touch_move(self, touch):
         if self.vs_ai:
@@ -143,7 +146,33 @@ class PongGame(Widget):
             elif touch.x > self.width - self.width / 3:
                 self.player2.center_y = touch.y
 
-    def return_to_main_menu(self, instance):
+    def show_results(self):
+        if self.player1.score > self.player2.score:
+            winner = "Red Wins!"
+        else:
+            winner = "Blue Wins!"
+
+        score_message = "Red Score: {}\nBlue Score: {}\nElapsed Time: {:.2f} seconds".format(
+            self.player1.score, self.player2.score, self.elapsed_time)
+
+        # Создаем виджет Label для победителя
+        winner_label = Label(text=winner, font_size='40sp')
+
+        # Создаем виджет Label с остальными результатами
+        score_label = Label(text=score_message)
+
+        # Создаем BoxLayout для размещения виджетов Label
+        layout = BoxLayout(orientation='vertical', padding=(0, 30))
+        layout.add_widget(winner_label)
+        layout.add_widget(score_label)
+
+        # Создаем Popup с новым контентом
+        message_box = Popup(title="Game Over", content=layout, size_hint=(None, None), size=(300, 300))
+        message_box.open()
+
+        self.return_to_main_menu()  # Вызываем метод возврата в главное меню
+
+    def return_to_main_menu(self):
         self.is_running = False
         self.reset_score()
         self.result = ''  # Clear the result
@@ -213,7 +242,6 @@ class PongApp(App):
 
     def build(self):
         game = PongGame()
-        game.serve_ball()
 
         layout = BoxLayout(orientation='vertical', spacing=20, padding=(30, 0, 0, 0))
 
