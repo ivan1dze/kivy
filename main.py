@@ -167,7 +167,7 @@ class PongGame(Widget):
         layout.add_widget(score_label)
 
         # Создаем Popup с новым контентом
-        message_box = Popup(title="Game Over", content=layout, size_hint=(None, None), size=(300, 300))
+        message_box = Popup(title="Game Over", content=layout, size_hint=(None, None), size=(700, 700))
         message_box.open()
 
         self.return_to_main_menu()  # Вызываем метод возврата в главное меню
