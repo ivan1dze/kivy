@@ -14,7 +14,7 @@ from kivy.properties import NumericProperty, ReferenceListProperty, ObjectProper
 from kivy.vector import Vector
 from kivy.clock import Clock
 from kivy.core.audio import SoundLoader
-from kivy.uix.popup import Popup  # Добавляем импорт для Popup
+from kivy.uix.popup import Popup
 from kivy.uix.label import Label
 
 log_config = LogConfig()
@@ -48,7 +48,7 @@ class PongPaddle(Widget):
             bounced = Vector(-1 * vx, vy)
             vel = bounced * 1.15
             ball.velocity = vel.x, vel.y + offset
-            logger.debug('Ball bounced')
+            logger.debug('Game: Ball bounced')
 
 
 class PongGame(Widget):
@@ -79,7 +79,7 @@ class PongGame(Widget):
         self.move_paddle_event = None  # Event for moving paddles
 
     def change_background(self, instance):
-        logger.debug('Background changed')
+        logger.debug('UI: Background changed')
         for i in range(len(self.backgrounds_list)):
             if PathEnum.BACKGROUNDS_PATH_ENUM + '/' + self.backgrounds_list[i] == self.background_image:
                 if i + 1 == len(self.backgrounds_list):
@@ -90,7 +90,7 @@ class PongGame(Widget):
                     break
 
     def change_ball(self, instance):
-        logger.debug('Ball changed')
+        logger.debug('UI: Ball changed')
         for i in range(len(self.ball.balls_list)):
             if PathEnum.BALLS_PATH_ENUM + '/' + self.ball.balls_list[i] == self.ball.ball_image:
                 if i + 1 == len(self.ball.balls_list):
@@ -104,6 +104,7 @@ class PongGame(Widget):
         self.ball.center = self.center
         angle = randint(10, 60)  # угол 10 и 240 градусов
         self.ball.velocity = Vector(vel[0], vel[1]).rotate(angle)
+        logger.debug('Game: Ball Start')
 
     def update(self, dt):
         if not self.is_running:
@@ -130,14 +131,14 @@ class PongGame(Widget):
             self.move_ai_paddle()
 
         if self.player1.score == 5:
-            self.result = "Red Wins!"
             self.is_running = False
             self.end_button.disabled = False
             self.end_button.opacity = 1
             Clock.unschedule(self.update)
+            logger.debug('Game: Red Win')
             self.show_results()  # Вызываем метод для вывода результатов
         elif self.player2.score == 5:
-            self.result = "Blue Wins!"
+            logger.debug('Game: Blue Win')
             self.is_running = False
             self.end_button.disabled = False
             self.end_button.opacity = 1
@@ -155,7 +156,7 @@ class PongGame(Widget):
                 self.player2.center_y = touch.y
 
     def show_results(self):
-        logger.debug('Pop up created')
+        logger.debug('UI: Pop up created')
         if self.player1.score > self.player2.score:
             winner = "Red Wins!"
         else:
@@ -184,7 +185,6 @@ class PongGame(Widget):
     def return_to_main_menu(self):
         self.is_running = False
         self.reset_score()
-        self.result = ''  # Clear the result
         self.remove_widget(self.end_button)
         self.start_button.disabled = False
         self.start_button.opacity = 1
@@ -200,6 +200,8 @@ class PongGame(Widget):
         self.serve_ball()  # Serve the ball for the next match
         self.start_time = 0
         self.elapsed_time = 0
+        logger.debug('Game: Returned to main menu')
+
 
     def start_game(self, instance):
         self.is_running = True
@@ -213,11 +215,11 @@ class PongGame(Widget):
         self.ball_button.opacity = 0
         self.add_widget(self.end_button)
         self.reset_score()
-        self.result = ''  # Clear the result
         self.end_button.disabled = True
         self.end_button.opacity = 0
         self.serve_ball()
         self.start_time = datetime.now().timestamp()
+        logger.debug('Game: Match started')
 
         if self.vs_ai:
             self.player2.center_y = self.center_y
@@ -235,7 +237,7 @@ class PongGame(Widget):
     def switch_mode(self, instance):
         self.vs_ai = not self.vs_ai
         instance.text = "AI Mode" if self.vs_ai else "2 Players Mode"
-        logger.debug('Mode switched: AI Mode' if self.vs_ai else '2 Players Mode')
+        logger.debug('Game: Mode switched to AI Mode' if self.vs_ai else 'Game: Mode switched to 2 Players')
 
     def move_paddles(self, dt):
         if self.vs_ai:
@@ -243,9 +245,9 @@ class PongGame(Widget):
 
     def move_ai_paddle(self):
         if self.ball.center_y > self.player2.center_y:
-            self.player2.center_y += min(5, self.ball.center_y - self.player2.center_y)
+            self.player2.center_y += min(4.5, self.ball.center_y - self.player2.center_y)
         elif self.ball.center_y < self.player2.center_y:
-            self.player2.center_y -= min(5, self.player2.center_y - self.ball.center_y)
+            self.player2.center_y -= min(4.5, self.player2.center_y - self.ball.center_y)
 
 
 class PongApp(App):
@@ -281,6 +283,7 @@ class PongApp(App):
         game.white_sound.volume = 0.08
         game.white_sound.play()
 
+        logger.debug('Game: Game started')
         return game
 
 
