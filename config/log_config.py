@@ -10,7 +10,7 @@ class LogConfig:
         self.log_folder = os.path.join(os.getenv('EXTERNAL_STORAGE'),
                                        'kivy') if platform == 'android' else os.path.join(
             os.path.expanduser('~'), '.kivy')
-        self.log_file = os.path.join(self.log_folder, 'game.log')
+        self.log_file = os.path.join(self.log_folder, self.filename)
 
     def configurate_log(self):
         # создаем папку если не создана
