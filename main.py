@@ -22,8 +22,8 @@ logger = log_config.configurate_log()
 
 
 class PongBall(Widget):
-    balls_list = os.listdir(PathEnum.BALLS_PATH_ENUM.value)
-    ball_image = StringProperty(PathEnum.BALLS_PATH_ENUM.value + '/' + balls_list[0])
+    balls_list = os.listdir(PathEnum.BALLS_PATH_ENUM)
+    ball_image = StringProperty(PathEnum.BALLS_PATH_ENUM + '/' + balls_list[0])
 
     velocity_x = NumericProperty(0)
     velocity_y = NumericProperty(0)
@@ -38,7 +38,7 @@ class PongPaddle(Widget):
 
     def __init__(self, **kwargs):
         super(PongPaddle, self).__init__(**kwargs)
-        self.otskok_sound = SoundLoader.load(PathEnum.BOUNCE_SOUND_PATH_ENUM.value)
+        self.otskok_sound = SoundLoader.load(PathEnum.BOUNCE_SOUND_PATH_ENUM)
 
     def bounce_ball(self, ball):
         if self.collide_widget(ball):
@@ -52,7 +52,7 @@ class PongPaddle(Widget):
 
 
 class PongGame(Widget):
-    backgrounds_list = os.listdir(PathEnum.BACKGROUNDS_PATH_ENUM.value)
+    backgrounds_list = os.listdir(PathEnum.BACKGROUNDS_PATH_ENUM)
     ball = ObjectProperty(None)
     player1 = ObjectProperty(None)
     player2 = ObjectProperty(None)
@@ -61,7 +61,7 @@ class PongGame(Widget):
     result = StringProperty('')
     start_time = NumericProperty(0)
     elapsed_time = NumericProperty(0)
-    background_image = StringProperty(PathEnum.BACKGROUNDS_PATH_ENUM.value + '/' + backgrounds_list[0])
+    background_image = StringProperty(PathEnum.BACKGROUNDS_PATH_ENUM + '/' + backgrounds_list[0])
 
     def __init__(self, **kwargs):
         super(PongGame, self).__init__(**kwargs)
@@ -69,8 +69,8 @@ class PongGame(Widget):
         self.mode_button = None
         self.background_image_button = None
         self.ball_button = None
-        self.white_sound = SoundLoader.load(PathEnum.WHITE_SOUND_PATH_ENUM.value)
-        self.end_button = Button(text=ButtonNamesEnum.RETURN_TO_MENU_BTN_ENUM.value, size_hint=(None, None), size=(350, 150),
+        self.white_sound = SoundLoader.load(PathEnum.WHITE_SOUND_PATH_ENUM)
+        self.end_button = Button(text=ButtonNamesEnum.RETURN_TO_MENU_BTN_ENUM, size_hint=(None, None), size=(350, 150),
                                  pos_hint={'x': 0.7})
         self.end_button.bind(on_press=self.show_results)  # Изменяем привязку кнопки к новому методу
         self.end_button.disabled = True
@@ -81,23 +81,23 @@ class PongGame(Widget):
     def change_background(self, instance):
         logger.debug('Background changed')
         for i in range(len(self.backgrounds_list)):
-            if PathEnum.BACKGROUNDS_PATH_ENUM.value + '/' + self.backgrounds_list[i] == self.background_image:
+            if PathEnum.BACKGROUNDS_PATH_ENUM + '/' + self.backgrounds_list[i] == self.background_image:
                 if i + 1 == len(self.backgrounds_list):
-                    self.background_image = PathEnum.BACKGROUNDS_PATH_ENUM.value + '/' + self.backgrounds_list[0]
+                    self.background_image = PathEnum.BACKGROUNDS_PATH_ENUM + '/' + self.backgrounds_list[0]
                     break
                 else:
-                    self.background_image = PathEnum.BACKGROUNDS_PATH_ENUM.value + '/' + self.backgrounds_list[i + 1]
+                    self.background_image = PathEnum.BACKGROUNDS_PATH_ENUM + '/' + self.backgrounds_list[i + 1]
                     break
 
     def change_ball(self, instance):
         logger.debug('Ball changed')
         for i in range(len(self.ball.balls_list)):
-            if PathEnum.BALLS_PATH_ENUM.value + '/' + self.ball.balls_list[i] == self.ball.ball_image:
+            if PathEnum.BALLS_PATH_ENUM + '/' + self.ball.balls_list[i] == self.ball.ball_image:
                 if i + 1 == len(self.ball.balls_list):
-                    self.ball.ball_image = PathEnum.BALLS_PATH_ENUM.value + '/' + self.ball.balls_list[0]
+                    self.ball.ball_image = PathEnum.BALLS_PATH_ENUM + '/' + self.ball.balls_list[0]
                     break
                 else:
-                    self.ball.ball_image = PathEnum.BALLS_PATH_ENUM.value + '/' + self.ball.balls_list[i + 1]
+                    self.ball.ball_image = PathEnum.BALLS_PATH_ENUM + '/' + self.ball.balls_list[i + 1]
                     break
 
     def serve_ball(self, vel=(8, 2)):
@@ -254,21 +254,21 @@ class PongApp(App):
         game = PongGame()
         layout = BoxLayout(orientation='vertical', spacing=20, padding=(30, 0, 0, 0))
 
-        game.start_button = Button(text=ButtonNamesEnum.START_BTN_ENUM.value, size_hint=(None, None), size=(290, 100))
+        game.start_button = Button(text=ButtonNamesEnum.START_BTN_ENUM, size_hint=(None, None), size=(290, 100))
         game.start_button.bind(on_press=game.start_game)
         layout.add_widget(game.start_button)
 
-        game.mode_button = Button(text=ButtonNamesEnum.GAME_MODE_BTN_ENUM.value, size_hint=(None, None),
+        game.mode_button = Button(text=ButtonNamesEnum.GAME_MODE_BTN_ENUM, size_hint=(None, None),
                                   size=(290, 100))
         game.mode_button.bind(on_press=game.switch_mode)
         layout.add_widget(game.mode_button)
 
-        game.background_image_button = Button(text=ButtonNamesEnum.CHANGE_TABLE_BTN_ENUM.value, size_hint=(None, None),
+        game.background_image_button = Button(text=ButtonNamesEnum.CHANGE_TABLE_BTN_ENUM, size_hint=(None, None),
                                               size=(290, 100))
         game.background_image_button.bind(on_press=game.change_background)
         layout.add_widget(game.background_image_button)
 
-        game.ball_button = Button(text=ButtonNamesEnum.CHANGE_BALL_BTN_ENUM.value, size_hint=(None, None),
+        game.ball_button = Button(text=ButtonNamesEnum.CHANGE_BALL_BTN_ENUM, size_hint=(None, None),
                                   size=(290, 100))
         game.ball_button.bind(on_press=game.change_ball)
         layout.add_widget(game.ball_button)

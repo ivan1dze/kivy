@@ -1,7 +1,4 @@
-from enum import Enum
-
-
-class PathEnum(Enum):
+class PathEnum():
     SRC_IMG_ENUM: str = 'src/img/'
     BALLS_PATH_ENUM: str = SRC_IMG_ENUM + 'balls'
     BACKGROUNDS_PATH_ENUM: str = SRC_IMG_ENUM + 'backgrounds'
@@ -11,7 +8,7 @@ class PathEnum(Enum):
     BOUNCE_SOUND_PATH_ENUM: str = SRC_SOUND_ENUM + 'otskok.mp3'
 
 
-class ButtonNamesEnum(Enum):
+class ButtonNamesEnum():
     START_BTN_ENUM: str = 'Start'
     GAME_MODE_BTN_ENUM: str = 'AI Mode'
     CHANGE_TABLE_BTN_ENUM: str = 'Change Table'
