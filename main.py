@@ -42,8 +42,8 @@ logger.debug('Log folder created: {}'.format(log_folder))
 logger.debug('Log file path: {}'.format(log_file))
 
 class PongBall(Widget):
-    balls_list = os.listdir('img/balls')
-    path_to_balls_imgs = 'img/balls/'
+    balls_list = os.listdir('src/img/balls')
+    path_to_balls_imgs = 'src/img/balls/'
     ball_image = StringProperty(path_to_balls_imgs + balls_list[0])
 
     velocity_x = NumericProperty(0)
@@ -59,7 +59,7 @@ class PongPaddle(Widget):
 
     def __init__(self, **kwargs):
         super(PongPaddle, self).__init__(**kwargs)
-        self.otskok_sound = SoundLoader.load('otskok.mp3')
+        self.otskok_sound = SoundLoader.load('src/sound/otskok.mp3')
 
     def bounce_ball(self, ball):
         if self.collide_widget(ball):
@@ -73,7 +73,7 @@ class PongPaddle(Widget):
 
 
 class PongGame(Widget):
-    backgrounds_list = os.listdir('img/backgrounds')
+    backgrounds_list = os.listdir('src/img/backgrounds')
     ball = ObjectProperty(None)
     player1 = ObjectProperty(None)
     player2 = ObjectProperty(None)
@@ -82,7 +82,7 @@ class PongGame(Widget):
     result = StringProperty('')
     start_time = NumericProperty(0)
     elapsed_time = NumericProperty(0)
-    path_to_bg_imgs = 'img/backgrounds/'
+    path_to_bg_imgs = 'src/img/backgrounds/'
     background_image = StringProperty(path_to_bg_imgs + backgrounds_list[0])
 
     def __init__(self, **kwargs):
@@ -91,7 +91,7 @@ class PongGame(Widget):
         self.mode_button = None
         self.background_image_button = None
         self.ball_button = None
-        self.white_sound = SoundLoader.load('chill.mp3')
+        self.white_sound = SoundLoader.load('src/sound/chill.mp3')
         self.end_button = Button(text='Return to Main Menu', size_hint=(None, None), size=(350, 150),
                                  pos_hint={'x': 0.7})
         self.end_button.bind(on_press=self.show_results)  # Изменяем привязку кнопки к новому методу
