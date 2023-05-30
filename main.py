@@ -1,4 +1,8 @@
 import os
+from random import randint
+from functools import partial
+from datetime import datetime
+
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.uix.button import Button
@@ -7,39 +11,12 @@ from kivy.properties import NumericProperty, ReferenceListProperty, ObjectProper
 from kivy.vector import Vector
 from kivy.clock import Clock
 from kivy.core.audio import SoundLoader
-from random import randint
-from functools import partial
-from datetime import datetime
 from kivy.uix.popup import Popup  # Добавляем импорт для Popup
 from kivy.uix.label import Label
-import logging
-from kivy.utils import platform
+from config.log_config import LogConfig
 
-log_folder = ""
-log_file = ""
-
-log_folder = os.path.join(os.getenv('EXTERNAL_STORAGE'), 'kivy') if platform == 'android' else os.path.join(os.path.expanduser('~'), '.kivy')
-log_file = os.path.join(log_folder, 'game.log')
-
-# создаем папку если не создана
-os.makedirs(log_folder, exist_ok=True)
-
-logger = logging.getLogger('game')
-logger.setLevel(logging.DEBUG)
-
-# создаем хендлер и ставим для его уровень
-file_handler = logging.FileHandler(log_file)
-file_handler.setLevel(logging.DEBUG)
-
-# формат для логгинга
-formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-file_handler.setFormatter(formatter)
-
-# добавляем хендлер в логгер
-logger.addHandler(file_handler)
-
-logger.debug('Log folder created: {}'.format(log_folder))
-logger.debug('Log file path: {}'.format(log_file))
+log_config = LogConfig()
+logger = log_config.configurate_log()
 
 class PongBall(Widget):
     balls_list = os.listdir('src/img/balls')
@@ -99,7 +76,6 @@ class PongGame(Widget):
         self.end_button.opacity = 0
 
         self.move_paddle_event = None  # Event for moving paddles
-
 
     def change_background(self, instance):
         logger.debug('Background changed')
@@ -259,6 +235,7 @@ class PongGame(Widget):
         self.vs_ai = not self.vs_ai
         instance.text = "AI Mode" if self.vs_ai else "2 Players Mode"
         logger.debug('Mode switched: AI Mode' if self.vs_ai else '2 Players Mode')
+
     def move_paddles(self, dt):
         if self.vs_ai:
             self.move_ai_paddle()
